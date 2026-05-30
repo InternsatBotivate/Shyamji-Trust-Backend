@@ -25,7 +25,7 @@ export const createOrderService = async (customerId, totalAmount) => {
     .single();
 
   if (error) throw error;
-  return { order, payment: data, key_id: process.env.TEST_API_KEY, qr_token: qrToken };
+  return { order, payment: data, key_id: process.env.LIVE_API_KEY, qr_token: qrToken };
 };
 
 export const verifyPaymentService = async ({
@@ -34,7 +34,7 @@ export const verifyPaymentService = async ({
   razorpay_signature,
 }) => {
   const body = `${razorpay_order_id}|${razorpay_payment_id}`;
-  const expectedSignature = createHmac("sha256", process.env.TEST_KEY_SECRET)
+  const expectedSignature = createHmac("sha256", process.env.LIVE_KEY_SECRET)
     .update(body)
     .digest("hex");
 

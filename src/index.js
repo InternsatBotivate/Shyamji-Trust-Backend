@@ -5,10 +5,14 @@ import dotenv from 'dotenv';
 import customerRoutes from './routes/customer.route.js';
 import paymentRoutes from './routes/payment.route.js';
 import webhookRoutes from './routes/webhook.route.js';
+import path from 'node:path';
 
-dotenv.config();
+dotenv.config({
+  path: String.raw`C:\Users\pryoucan\Documents\secrets\shyam-ji-backend/.env`
+});
 
 const app = express();
+
 const port = process.env.PORT || 5000;
 
 const allowedOrigins = process.env.FRONTEND_URL
@@ -40,4 +44,8 @@ app.listen(port, (error) => {
     throw new Error(error);
   }
   console.log(`Server is running on port ${port}`);
+  console.log('[ENV] SUPABASE_URL:', process.env.SUPABASE_URL ? 'SET' : 'MISSING');
+  console.log('[ENV] SUPABASE_SECRET_KEY:', process.env.SUPABASE_SECRET_KEY ? 'SET' : 'MISSING');
+  console.log('[ENV] TEST_API_KEY:', process.env.LIVE_API_KEY ? 'SET' : 'MISSING');
+  console.log('[ENV] FRONTEND_URL:', process.env.FRONTEND_URL || 'NOT SET');
 });

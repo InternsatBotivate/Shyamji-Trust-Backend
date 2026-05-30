@@ -1,6 +1,7 @@
 import { createCustomer } from '../services/customer.service.js';
 
 export const submitCustomer = async (req, res) => {
+  console.log('[/api/customers] Request received:', JSON.stringify(req.body));
   try {
     const {
       name,
@@ -42,6 +43,7 @@ export const submitCustomer = async (req, res) => {
     if (isNaN(parsedTotal) || parsedTotal <= 0)
       return res.status(400).json({ error: 'Total amount must be greater than 0' });
 
+    console.log('[/api/customers] Validation passed, inserting to Supabase...');
     const customer = await createCustomer({
       name: String(name).trim(),
       phone_no: cleanPhone,
@@ -55,9 +57,10 @@ export const submitCustomer = async (req, res) => {
       mahant_meeting_amount: parseFloat(mahant_meeting_amount) || 0,
     });
 
+    console.log('[/api/customers] Customer created successfully:', customer?.id);
     return res.status(201).json({ success: true, data: customer });
   } catch (err) {
-    console.error('Customer submission error:', err);
+    console.error('[/api/customers] Error:', err?.message, err?.code, err?.details);
     return res.status(500).json({ error: 'Internal server error. Please try again.' });
   }
 };

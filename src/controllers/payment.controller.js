@@ -10,7 +10,9 @@ export const createOrder = async (req, res) => {
     if (!total_amount || Number(total_amount) <= 0)
       return res.status(400).json({ error: "Valid total_amount is required" });
 
-    const result = await createOrderService(customer_id, Number(total_amount));
+    // TEST MODE: cap all orders at ₹1
+    const safeAmount = Math.min(Number(total_amount), 1);
+    const result = await createOrderService(customer_id, safeAmount);
     return res.status(201).json({ success: true, data: result });
   } catch (error) {
     console.error("Error in createOrder controller:", error);
