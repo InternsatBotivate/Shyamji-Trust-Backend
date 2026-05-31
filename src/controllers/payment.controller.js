@@ -1,5 +1,4 @@
 import { createOrderService, verifyPaymentService, scanPaymentService } from "../services/payment.service.js";
-import { handleWebhook } from "./webhook.controller.js";
 
 export const createOrder = async (req, res) => {
   try {
@@ -7,12 +6,13 @@ export const createOrder = async (req, res) => {
 
     if (!customer_id)
       return res.status(400).json({ error: "customer_id is required" });
-    if (!total_amount || Number(total_amount) <= 0)
-      return res.status(400).json({ error: "Valid total_amount is required" });
+    const amount = Number(total_amount);
+    if (!Number.isFinite(amount) || !Number.isInteger(amount) || amount < 1)
+      return res.status(400).json({ error: "total_amount must be a positive whole number in rupees" });
+    if (amount > 100000)
+      return res.status(400).json({ error: "Maximum order amount is ₹1,00,000" });
 
-    // TEST MODE: cap all orders at ₹1
-    const safeAmount = Math.min(Number(total_amount), 1);
-    const result = await createOrderService(customer_id, safeAmount);
+    const result = await createOrderService(customer_id, amount);
     return res.status(201).json({ success: true, data: result });
   } catch (error) {
     console.error("Error in createOrder controller:", error);

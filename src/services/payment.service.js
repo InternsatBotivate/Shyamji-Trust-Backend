@@ -34,6 +34,7 @@ export const verifyPaymentService = async ({
   razorpay_signature,
 }) => {
   const body = `${razorpay_order_id}|${razorpay_payment_id}`;
+  if (!process.env.LIVE_KEY_SECRET) throw Object.assign(new Error("Payment configuration error"), { status: 500 });
   const expectedSignature = createHmac("sha256", process.env.LIVE_KEY_SECRET)
     .update(body)
     .digest("hex");
@@ -66,8 +67,14 @@ export const scanPaymentService = async (qrToken) => {
     .single();
 
   if (error) {
-    const err = new Error("Invalid or unverified ticket QR Code");
-    err.status = 404;
+    if (error.code === "PGRST116") {
+      const err = new Error("Invalid or unverified ticket QR Code");
+      err.status = 404;
+      throw err;
+    }
+    console.error("scanPaymentService DB error:", error);
+    const err = new Error("Database error while scanning QR code");
+    err.status = 500;
     throw err;
   }
 
