@@ -9,10 +9,14 @@ export const createOrder = async (req, res) => {
     const amount = Number(total_amount);
     if (!Number.isFinite(amount) || !Number.isInteger(amount) || amount < 1)
       return res.status(400).json({ error: "total_amount must be a positive whole number in rupees" });
-    if (amount > 100000)
+
+    // Gross up so recipient receives the full intended amount after Razorpay deducts ~2% + 18% GST on fee (2.36% effective)
+    const grossedAmount = Math.ceil(amount / (1 - 0.0236));
+
+    if (grossedAmount > 100000)
       return res.status(400).json({ error: "Maximum order amount is ₹1,00,000" });
 
-    const result = await createOrderService(customer_id, amount);
+    const result = await createOrderService(customer_id, grossedAmount);
     return res.status(201).json({ success: true, data: result });
   } catch (error) {
     console.error("Error in createOrder controller:", error);

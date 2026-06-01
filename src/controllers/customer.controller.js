@@ -35,9 +35,9 @@ export const submitCustomer = async (req, res) => {
     if (cleanAadhaar.length > 0 && !/^\d{12}$/.test(cleanAadhaar))
       return res.status(400).json({ error: 'Valid 12-digit Aadhaar number is required' });
 
-    const parsedDonation = parseFloat(donation_amount);
+    const parsedDonation = donation_amount == null || donation_amount === '' ? 0 : parseFloat(donation_amount);
     if (isNaN(parsedDonation) || parsedDonation < 0)
-      return res.status(400).json({ error: 'Valid donation amount is required' });
+      return res.status(400).json({ error: 'Donation amount must be a non-negative number' });
 
     const parsedTotal = parseFloat(total_amount);
     if (isNaN(parsedTotal) || parsedTotal <= 0)
